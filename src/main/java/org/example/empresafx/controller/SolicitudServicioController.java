@@ -50,6 +50,10 @@ public class SolicitudServicioController {
     private ToggleGroup grupoPrioridad;
 
     private Cliente cliente;
+    @FXML
+    private TextArea txtResultado;
+
+
 
 
     @FXML
@@ -126,6 +130,12 @@ public class SolicitudServicioController {
                 "Archivo adjunto: " + txtArchivo.getText() + "\n"+
                 "Carpeta de evidencia: " + txtEvidencias.getText() + "\n";
 
+        txtResultado.setText(resultado);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Solicitud de servicio");
+        alert.setContentText("La solicitud fue registrada");
+
     }
 
     private boolean validateForm() {
@@ -201,4 +211,6 @@ public class SolicitudServicioController {
     }
 
 
+    public void clickCerrar(ActionEvent actionEvent) {
+    }
 }
