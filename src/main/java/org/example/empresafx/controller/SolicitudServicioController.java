@@ -1,5 +1,6 @@
 package org.example.empresafx.controller;
 
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,6 +10,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.example.empresafx.application.RegistroClienteApplication;
+import org.example.empresafx.model.Cliente;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +22,7 @@ public class SolicitudServicioController {
     @FXML
     private TextField txtCorreo;
     @FXML
-    private ComboBox<String> cmbTipoCliente;
+    private TextField txtTipoCliente;
     @FXML
     private TextField txtAsunto;
     @FXML
@@ -47,16 +49,13 @@ public class SolicitudServicioController {
 
     private ToggleGroup grupoPrioridad;
 
+    private Cliente cliente;
+
+
     @FXML
     public void initialize() {
 
-        // Tipo de cliente
-        cmbTipoCliente.getItems().addAll(
-                "Cliente Regular",
-                "Cliente Frecuente"
-        );
 
-        // Tipo de servicio
         cmbServicio.getItems().addAll(
                 "Soporte técnico",
                 "Mantenimiento",
@@ -72,10 +71,21 @@ public class SolicitudServicioController {
         btnRadioBaja.setToggleGroup(grupoPrioridad);
     }
 
+
+    public void recibirCliente(Cliente cliente){
+        if(cliente == null){
+            return;
+        }
+        this.cliente = cliente;
+        txtCliente.setText(cliente.getNombre());
+        txtCorreo.setText(cliente.getCorreo());
+        txtTipoCliente.setText(cliente.getTipoCLiente());
+
+    }
     public void clickLimpiarServicio(ActionEvent actionEvent) {
         txtCliente.clear();
         txtCorreo.clear();
-        cmbTipoCliente.getSelectionModel().clearSelection();
+        txtTipoCliente.clear();
         txtAsunto.clear();
         cmbServicio.getSelectionModel().clearSelection();
         txtAreaDescripcion.clear();
@@ -96,18 +106,25 @@ public class SolicitudServicioController {
 
     public void clickGuardarServicio(ActionEvent actionEvent) {
         if(!validateForm()) {
-            System.out.println("Por favor, complete todos los campos antes de guardar.");
             return;
-        }else{
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            System.out.println("Cliente registrado: " + txtCliente.getText());
-            alert.setTitle("Guardado");
-            alert.setHeaderText("Guardado");
-            alert.setContentText("El cliente ha sido registrado correctamente.");
-            alert.showAndWait();
-
         }
-
+        String informacionCliente;
+        if(cliente != null){
+            informacionCliente = "Datos del cliente: \n" ;
+            informacionCliente += cliente.getNombre() + "\n" ;
+            informacionCliente += cliente.getCorreo() + "\n" ;
+            informacionCliente += cliente.getTipoCLiente() + "\n" ;
+        }
+        else{
+            informacionCliente = "Datos del cliente: \n" + "Solicitud sin cliente";
+        }
+        String resultado = informacionCliente + "\n" + "Solicitud de servicio\n" +
+                "Asunto: " + txtAsunto.getText() + "\n"+
+                "Tipo de servicio: " + cmbServicio.getValue() + "\n" +
+                "Prioridad: " + grupoPrioridad.getSelectedToggle()+ "\n" +
+                "Descripcion del problema: " + txtAreaDescripcion.getText() + "\n" +
+                "Archivo adjunto: " + txtArchivo.getText() + "\n"+
+                "Carpeta de evidencia: " + txtEvidencias.getText() + "\n";
 
     }
 
@@ -119,7 +136,7 @@ public class SolicitudServicioController {
                         txtEvidencias.getText().isEmpty() ||
                         txtCorreo.getText().isEmpty() ||
                         txtAsunto.getText().isEmpty() ||
-                        cmbTipoCliente.getValue() == null ||
+                        txtTipoCliente.getText().isEmpty() ||
                         cmbServicio.getValue() == null ||
                         txtAreaDescripcion.getText().isEmpty() ||
                         grupoPrioridad.getSelectedToggle() == null
@@ -182,4 +199,6 @@ public class SolicitudServicioController {
             txtArchivo.setText(f.getAbsolutePath());
         }
     }
+
+
 }

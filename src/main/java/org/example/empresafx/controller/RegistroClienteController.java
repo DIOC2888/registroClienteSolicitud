@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -14,6 +15,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.example.empresafx.application.RegistroClienteApplication;
+import org.example.empresafx.model.Cliente;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,8 +45,8 @@ public class RegistroClienteController {
                 FXCollections.observableArrayList(
                         "Cliente Regular",
                         "Cliente Frecuente"
-                )
-        );
+                ));
+
     }
 
     public void clickExaminarIdentificacion(ActionEvent actionEvent) {
@@ -85,13 +87,6 @@ public class RegistroClienteController {
         alert.setContentText("El proyecto ha sido guardado correctamente.");
         alert.showAndWait();
 
-        String nombre = txtNombre.getText();
-        String correo = txtCorreo.getText();
-        String telefono = txtTelefono.getText();
-        String tipoCliente = cmbCliente.getValue();
-        String identificacion = txtIdentificacion.getText();
-        String directorio = txtDirectorio.getText();
-
     }
 
     public void clickLimpiar(ActionEvent actionEvent) {
@@ -104,12 +99,28 @@ public class RegistroClienteController {
     }
 
     public void clickCrearSolicitud(ActionEvent actionEvent) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(RegistroClienteApplication.class.getResource("/org/example/empresafx/solicitud-servicio.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
-        Stage stage = new Stage();
-        stage.setTitle("Solicitud de servicio");
-        stage.setScene(scene);
-        stage.show();
+      if(!validateForm()) {
+          return;
+      }
+      Cliente cliente = construirCliente();
+
+      try{
+            FXMLLoader fxmlLoader = new FXMLLoader(RegistroClienteApplication.class.getResource("/org/example/empresafx/solicitud-servicio.fxml"));
+            Parent root = fxmlLoader.load();
+            SolicitudServicioController controller = fxmlLoader.getController();
+            controller.recibirCliente(cliente);
+            Stage stage = new Stage();
+            stage.setTitle("Solicitud de servicio");
+            stage.setScene(new Scene(root));
+            stage.show();
+
+      }catch(IOException e){
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error al crear la solicitud");
+            alert.setContentText("Ocurrió un error al crear la solicitud: " + e.getMessage());
+            alert.showAndWait();
+      }
     }
 
 
@@ -129,4 +140,21 @@ public class RegistroClienteController {
     }
         return true;
     }
+
+    private Cliente construirCliente(){
+        return new Cliente(
+                txtNombre.getText().trim(),
+                txtCorreo.getText().trim(),
+                txtTelefono.getText().trim(),
+                cmbCliente.getValue(),
+                txtIdentificacion.getText().trim(),
+                txtDirectorio.getText().trim()
+        );
+    }
+
+
+
+
+
+
 }
